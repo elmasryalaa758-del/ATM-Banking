@@ -1,8 +1,6 @@
-// ATM Banking System
 
 const prompt = require("prompt-sync")();
 
-// بيانات الحساب
 let userPIN = "1234";
 let balance = 5000;
 
