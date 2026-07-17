@@ -1,136 +1,79 @@
-const readline = require("readline");
+function checkout() {
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+    let customer = document.getElementById("customer").value;
+    let category = document.getElementById("category").value;
+    let price = parseFloat(document.getElementById("price").value);
+    let quantity = parseInt(document.getElementById("quantity").value);
+    let coupon = document.getElementById("coupon").value.toUpperCase();
+    let payment = document.getElementById("payment").value;
 
-let pin = "1234";
-let balance = 5000;
-let attempts = 0;
+    // Subtotal
+    let subtotal = price * quantity;
 
-function askPin() {
-    rl.question("Enter PIN: ", (enteredPin) => {
+    // Category Discount
+    let categoryDiscount = 0;
 
-        if (enteredPin === pin) {
-            console.log("\nWelcome!");
+    if (category === "Electronics") {
+        categoryDiscount = subtotal * 0.10;
+    }
+    else if (category === "Clothing") {
+        categoryDiscount = subtotal * 0.15;
+    }
+    else if (category === "Food") {
+        categoryDiscount = subtotal * 0.05;
+    }
 
-            showMenu();
+    let total = subtotal - categoryDiscount;
 
-        } else {
+    // Coupon Discount
+    let couponDiscount = 0;
 
-            attempts++;
+    if (coupon === "SAVE10") {
+        couponDiscount = total * 0.10;
+    }
 
-            console.log("Wrong PIN");
+    total -= couponDiscount;
 
-            if (attempts === 3) {
-                console.log("Account Locked");
-                rl.close();
-            } else {
-                askPin();
-            }
-        }
+    // Payment Discount
+    let paymentDiscount = 0;
 
-    });
+    if (payment === "Visa") {
+        paymentDiscount = total * 0.05;
+    }
+    else if (payment === "Wallet") {
+        paymentDiscount = total * 0.08;
+    }
+
+    total -= paymentDiscount;
+
+    // Bonus
+    if (total < 0) {
+        total = 0;
+    }
+
+    // VAT 14%
+    let vat = total * 0.14;
+
+    let finalPrice = total + vat;
+
+    // Invoice
+    document.getElementById("invoice").innerHTML = `
+        <h3>Invoice</h3>
+
+        <p><strong>Customer:</strong> ${customer}</p>
+
+        <p><strong>Category:</strong> ${category}</p>
+
+        <p><strong>Subtotal:</strong> ${subtotal.toFixed(2)}</p>
+
+        <p><strong>Category Discount:</strong> ${categoryDiscount.toFixed(2)}</p>
+
+        <p><strong>Coupon Discount:</strong> ${couponDiscount.toFixed(2)}</p>
+
+        <p><strong>Payment Discount:</strong> ${paymentDiscount.toFixed(2)}</p>
+
+        <p><strong>VAT (14%):</strong> ${vat.toFixed(2)}</p>
+
+        <h2>Final Price: ${finalPrice.toFixed(2)}</h2>
+    `;
 }
-
-function showMenu() {
-
-    console.log("\n===== ATM MENU =====");
-    console.log("1. Withdraw");
-    console.log("2. Deposit");
-    console.log("3. Check Balance");
-    console.log("4. Change PIN");
-    console.log("5. Exit");
-
-    rl.question("Choose an option: ", (choice) => {
-
-        switch (choice) {
-
-            case "1":
-
-                rl.question("Enter amount: ", (amount) => {
-
-                    amount = Number(amount);
-
-                    if (amount <= 0) {
-                        console.log("Invalid Amount");
-                    } else if (amount > balance) {
-                        console.log("Insufficient Balance");
-                    } else {
-                        balance -= amount;
-                        console.log("Withdrawal Successful");
-                        console.log("Current Balance: " + balance);
-                    }
-
-                    showMenu();
-
-                });
-
-                break;
-
-            case "2":
-
-                rl.question("Enter amount: ", (amount) => {
-
-                    amount = Number(amount);
-
-                    if (amount > 0) {
-                        balance += amount;
-                        console.log("Deposit Successful");
-                        console.log("Current Balance: " + balance);
-                    } else {
-                        console.log("Invalid Amount");
-                    }
-
-                    showMenu();
-
-                });
-
-                break;
-
-            case "3":
-
-                console.log("Current Balance: " + balance);
-
-                showMenu();
-
-                break;
-
-            case "4":
-
-                rl.question("Enter New 4-digit PIN: ", (newPin) => {
-
-                    if (/^\d{4}$/.test(newPin)) {
-                        pin = newPin;
-                        console.log("PIN Changed Successfully");
-                    } else {
-                        console.log("PIN must contain exactly 4 digits.");
-                    }
-
-                    showMenu();
-
-                });
-
-                break;
-
-            case "5":
-
-                console.log("Thank you for using the ATM.");
-                rl.close();
-
-                break;
-
-            default:
-
-                console.log("Invalid Choice");
-
-                showMenu();
-
-        }
-
-    });
-
-}
-
-askPin();1234
